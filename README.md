@@ -22,7 +22,7 @@ webtransport:
 
 ## API接口
 
-- `/webtransport/play/[streamPath]` 用来播放
-- `/webtransport/push/[streamPath]` 用来推流
+- `/play/[streamPath]` 用来播放
+- `/push/[streamPath]` 用来推流
 
 建立双向流后传输flv格式的数据

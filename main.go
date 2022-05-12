@@ -19,7 +19,7 @@ func (c *WebTransportConfig) OnEvent(event any) {
 	case FirstConfig:
 		mux := http.NewServeMux()
 		mux.HandleFunc("/play/", func(w http.ResponseWriter, r *http.Request) {
-			streamPath := r.URL.Path[5:]
+			streamPath := r.URL.Path[len("/play/"):]
 			session := r.Body.(*webtransport.Session)
 			session.AcceptSession()
 			defer session.CloseSession()
@@ -39,7 +39,7 @@ func (c *WebTransportConfig) OnEvent(event any) {
 			plugin.SubscribeBlock(streamPath, sub)
 		})
 		mux.HandleFunc("/push/", func(w http.ResponseWriter, r *http.Request) {
-			streamPath := r.URL.Path[5:]
+			streamPath := r.URL.Path[len("/push/"):]
 			session := r.Body.(*webtransport.Session)
 			session.AcceptSession()
 			defer session.CloseSession()
@@ -57,7 +57,7 @@ func (c *WebTransportConfig) OnEvent(event any) {
 			pub.SetIO(s)
 			pub.ID = strconv.FormatInt(int64(s.StreamID()), 10)
 			if plugin.Publish(streamPath, pub) == nil {
-				
+
 			}
 		})
 		server := &webtransport.Server{
