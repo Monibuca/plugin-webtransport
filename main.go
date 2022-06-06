@@ -17,6 +17,10 @@ type WebTransportConfig struct {
 func (c *WebTransportConfig) OnEvent(event any) {
 	switch event.(type) {
 	case FirstConfig:
+		if c.CertFile == "" || c.KeyFile == "" {
+			plugin.Warn("no cert or key file specified, plugin disabled")
+			return
+		}
 		mux := http.NewServeMux()
 		mux.HandleFunc("/play/", func(w http.ResponseWriter, r *http.Request) {
 			streamPath := r.URL.Path[len("/play/"):]
@@ -72,6 +76,6 @@ func (c *WebTransportConfig) OnEvent(event any) {
 
 var plugin = InstallPlugin(&WebTransportConfig{
 	ListenAddr: ":4433",
-	CertFile:   "cert.pem",
-	KeyFile:    "cert.key",
+	CertFile:   "",
+	KeyFile:    "",
 })
