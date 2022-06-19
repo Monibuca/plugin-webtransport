@@ -40,7 +40,7 @@ func (c *WebTransportConfig) OnEvent(event any) {
 			sub := &WebTransportSubscriber{}
 			sub.SetIO(s)
 			sub.ID = strconv.FormatInt(int64(s.StreamID()), 10)
-			plugin.SubscribeBlock(streamPath, sub)
+			plugin.SubscribeBlock(streamPath, sub, SUBTYPE_FLV)
 		})
 		mux.HandleFunc("/push/", func(w http.ResponseWriter, r *http.Request) {
 			streamPath := r.URL.Path[len("/push/"):]
