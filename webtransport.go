@@ -230,7 +230,7 @@ type SendStream struct {
 }
 
 // Stream wraps a quic.Stream providing a bidirectional server<->client stream, including Read and Write functions.
-type Stream quic.Stream
+type WtStream quic.Stream
 
 // Read reads up to len(p) bytes from a WebTransport unidirectional stream, returning the actual number of bytes read.
 func (s *ReceiveStream) Read(p []byte) (int, error) {
@@ -340,7 +340,7 @@ func (s *Session) SendMessage(msg []byte) error {
 
 // AcceptStream accepts an incoming (that is, client-initated) bidirectional stream, blocking if necessary until one is available. Supply your own context, or use the WebTransport
 // session's Context() so that ending the WebTransport session automatically cancels this call.
-func (s *Session) AcceptStream() (Stream, error) {
+func (s *Session) AcceptStream() (WtStream, error) {
 	stream, err := s.Session.AcceptStream(s.context)
 	if err != nil {
 		return stream, err
@@ -359,7 +359,7 @@ func (s *Session) AcceptUniStream(ctx context.Context) (ReceiveStream, error) {
 	return ReceiveStream{ReceiveStream: stream, readHeaderBeforeData: true, headerRead: false}, err
 }
 
-func (s *Session) internalOpenStream(ctx *context.Context, sync bool) (Stream, error) {
+func (s *Session) internalOpenStream(ctx *context.Context, sync bool) (WtStream, error) {
 	var stream quic.Stream
 	var err error
 
@@ -394,14 +394,14 @@ func (s *Session) internalOpenUniStream(ctx *context.Context, sync bool) (SendSt
 }
 
 // OpenStream creates an outgoing (that is, server-initiated) bidirectional stream. It returns immediately.
-func (s *Session) OpenStream() (Stream, error) {
+func (s *Session) OpenStream() (WtStream, error) {
 	return s.internalOpenStream(nil, false)
 }
 
 // OpenStream creates an outgoing (that is, server-initiated) bidirectional stream. It generally returns immediately, but if the session's maximum number of streams
 // has been exceeded, it will block until a slot is available. Supply your own context, or use the WebTransport
 // session's Context() so that ending the WebTransport session automatically cancels this call.
-func (s *Session) OpenStreamSync(ctx context.Context) (Stream, error) {
+func (s *Session) OpenStreamSync(ctx context.Context) (WtStream, error) {
 	return s.internalOpenStream(&ctx, true)
 }
 
