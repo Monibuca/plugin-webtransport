@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	webtransport "github.com/adriancable/webtransport-go"
 	. "m7s.live/engine/v4"
 )
 
@@ -24,7 +23,7 @@ func (c *WebTransportConfig) OnEvent(event any) {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/play/", func(w http.ResponseWriter, r *http.Request) {
 			streamPath := r.URL.Path[len("/play/"):]
-			session := r.Body.(*webtransport.Session)
+			session := r.Body.(*Session)
 			session.AcceptSession()
 			defer session.CloseSession()
 			// TODO: 多路
@@ -44,7 +43,7 @@ func (c *WebTransportConfig) OnEvent(event any) {
 		})
 		mux.HandleFunc("/push/", func(w http.ResponseWriter, r *http.Request) {
 			streamPath := r.URL.Path[len("/push/"):]
-			session := r.Body.(*webtransport.Session)
+			session := r.Body.(*Session)
 			session.AcceptSession()
 			defer session.CloseSession()
 			// TODO: 多路
@@ -64,11 +63,11 @@ func (c *WebTransportConfig) OnEvent(event any) {
 
 			}
 		})
-		server := &webtransport.Server{
+		server := &Server{
 			Handler:    mux,
 			ListenAddr: c.ListenAddr,
-			TLSCert:    webtransport.CertFile{Path: c.CertFile},
-			TLSKey:     webtransport.CertFile{Path: c.KeyFile},
+			TLSCert:    CertFile{Path: c.CertFile},
+			TLSKey:     CertFile{Path: c.KeyFile},
 		}
 		go server.Run(plugin)
 	}
