@@ -16,8 +16,8 @@ https://github.com/Monibuca/plugin-webtransport
 ```yaml
 webtransport:
   listenaddr: :4433
-  certfile: monibuca.com.pem
-  keyfile: monibuca.com.key
+  certfile: local.monibuca.com_bundle.pem
+  keyfile: local.monibuca.com.key
 ```
 
 ## API接口

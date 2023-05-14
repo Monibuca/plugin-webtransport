@@ -4,22 +4,19 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/quic-go/quic-go"
 	. "m7s.live/engine/v4"
 )
 
 type WebTransportConfig struct {
-	ListenAddr string
-	CertFile   string
-	KeyFile    string
+	ListenAddr string `default:":4433"`
+	CertFile   string `default:"local.monibuca.com_bundle.pem"`
+	KeyFile    string `default:"local.monibuca.com.key"`
 }
 
 func (c *WebTransportConfig) OnEvent(event any) {
 	switch event.(type) {
 	case FirstConfig:
-		if c.CertFile == "" || c.KeyFile == "" {
-			plugin.Warn("no cert or key file specified, plugin disabled")
-			return
-		}
 		mux := http.NewServeMux()
 		mux.HandleFunc("/play/", func(w http.ResponseWriter, r *http.Request) {
 			streamPath := r.URL.Path[len("/play/"):]
@@ -63,18 +60,43 @@ func (c *WebTransportConfig) OnEvent(event any) {
 
 			}
 		})
-		server := &Server{
-			Handler:    mux,
-			ListenAddr: c.ListenAddr,
-			TLSCert:    CertFile{Path: c.CertFile},
-			TLSKey:     CertFile{Path: c.KeyFile},
-		}
-		go server.Run(plugin)
+		c.Run(mux)
 	}
 }
 
-var plugin = InstallPlugin(&WebTransportConfig{
-	ListenAddr: ":4433",
-	CertFile:   "",
-	KeyFile:    "",
-})
+func (c *WebTransportConfig) Run(mux http.Handler) {
+	s := &Server{
+		Handler:    mux,
+		ListenAddr: c.ListenAddr,
+		TLSCert:    CertFile{Path: c.CertFile},
+		TLSKey:     CertFile{Path: c.KeyFile},
+	}
+
+	if s.QuicConfig == nil {
+		s.QuicConfig = &QuicConfig{}
+	}
+	s.QuicConfig.EnableDatagrams = true
+
+	listener, err := quic.ListenAddr(c.ListenAddr, s.generateTLSConfig(), (*quic.Config)(s.QuicConfig))
+	if err != nil {
+		plugin.Disabled = true
+		return
+	}
+
+	go func() {
+		<-plugin.Done()
+		listener.Close()
+	}()
+
+	go func() {
+		for {
+			sess, err := listener.Accept(plugin)
+			if err != nil {
+				return
+			}
+			go s.handleSession(plugin, sess)
+		}
+	}()
+}
+
+var plugin = InstallPlugin(&WebTransportConfig{})
