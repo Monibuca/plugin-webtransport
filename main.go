@@ -8,12 +8,13 @@ import (
 	"github.com/quic-go/quic-go"
 	"go.uber.org/zap"
 	. "m7s.live/engine/v4"
+	"m7s.live/engine/v4/config"
 )
 
 type WebTransportConfig struct {
 	ListenAddr string `default:":4433"`
-	CertFile   string `default:"local.monibuca.com_bundle.pem"`
-	KeyFile    string `default:"local.monibuca.com.key"`
+	CertFile   string
+	KeyFile    string
 }
 
 func (c *WebTransportConfig) OnEvent(event any) {
@@ -82,8 +83,8 @@ func (c *WebTransportConfig) Run(mux http.Handler) {
 	s := &Server{
 		Handler:    mux,
 		ListenAddr: c.ListenAddr,
-		TLSCert:    CertFile{Path: c.CertFile},
-		TLSKey:     CertFile{Path: c.KeyFile},
+		TLSCert:    CertFile{Path: c.CertFile, Data: config.LocalCert},
+		TLSKey:     CertFile{Path: c.KeyFile, Data: config.LocalKey},
 	}
 
 	if s.QuicConfig == nil {
