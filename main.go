@@ -20,17 +20,21 @@ type WebTransportConfig struct {
 func (c *WebTransportConfig) OnEvent(event any) {
 	switch event.(type) {
 	case FirstConfig:
-		_, err := os.Stat(c.CertFile)
-		if err != nil {
-			plugin.Error("need certfile", zap.Error(err))
-			plugin.Disabled = true
-			return
+		if c.CertFile != "" {
+			_, err := os.Stat(c.CertFile)
+			if err != nil {
+				plugin.Error("need certfile", zap.Error(err))
+				plugin.Disabled = true
+				return
+			}
 		}
-		_, err = os.Stat(c.KeyFile)
-		if err != nil {
-			plugin.Error("need keyfile", zap.Error(err))
-			plugin.Disabled = true
-			return
+		if c.KeyFile != "" {
+			_, err := os.Stat(c.KeyFile)
+			if err != nil {
+				plugin.Error("need keyfile", zap.Error(err))
+				plugin.Disabled = true
+				return
+			}
 		}
 		mux := http.NewServeMux()
 		mux.HandleFunc("/play/", func(w http.ResponseWriter, r *http.Request) {
