@@ -1,6 +1,7 @@
 package webtransport
 
 import (
+	"go.uber.org/zap"
 	. "m7s.live/engine/v4"
 	"m7s.live/engine/v4/codec"
 )
@@ -15,7 +16,7 @@ func (wt *WebTransportSubscriber) OnEvent(event any) {
 		wt.Write(codec.FLVHeader)
 	case FLVFrame:
 		if _, err := v.WriteTo(wt); err != nil {
-			wt.Stop()
+			wt.Stop(zap.Error(err))
 		}
 	default:
 		wt.Subscriber.OnEvent(event)

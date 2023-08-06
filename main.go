@@ -53,6 +53,7 @@ func (c *WebTransportConfig) OnEvent(event any) {
 			// 	return
 			// }
 			sub := &WebTransportSubscriber{}
+			sub.RemoteAddr = r.RemoteAddr
 			sub.SetIO(s)
 			sub.ID = strconv.FormatInt(int64(s.StreamID()), 10)
 			plugin.SubscribeBlock(streamPath, sub, SUBTYPE_FLV)
