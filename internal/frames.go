@@ -1,7 +1,6 @@
 package h3
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/quic-go/quic-go/quicvarint"
@@ -56,15 +55,12 @@ func (f *Frame) Read(r io.Reader) error {
 }
 
 func (f *Frame) Write(w io.Writer) (int, error) {
-	buf := &bytes.Buffer{}
-
-	quicvarint.Write(buf, f.Type)
+	var buf []byte
+	buf = quicvarint.Append(buf, f.Type)
 	if f.Type == FRAME_WEBTRANSPORT_STREAM {
-		quicvarint.Write(buf, f.SessionID)
+		buf = quicvarint.Append(buf, f.SessionID)
 	} else {
-		quicvarint.Write(buf, f.Length)
+		buf = quicvarint.Append(buf, f.Length)
 	}
-	buf.Write(f.Data)
-
-	return w.Write(buf.Bytes())
+	return w.Write(append(buf, f.Data...))
 }

@@ -54,18 +54,15 @@ func (s *SettingsMap) FromFrame(f Frame) error {
 func (s SettingsMap) ToFrame() Frame {
 	f := Frame{Type: FRAME_SETTINGS}
 
-	b := &bytes.Buffer{}
 	var l uint64
 	for id, val := range s {
 		l += uint64(quicvarint.Len(uint64(id)) + quicvarint.Len(val))
 	}
 	f.Length = l
 	for id, val := range s {
-		quicvarint.Write(b, uint64(id))
-		quicvarint.Write(b, val)
+		f.Data = quicvarint.Append(f.Data, uint64(id))
+		f.Data = quicvarint.Append(f.Data, val)
 	}
-	f.Data = b.Bytes()
-
 	return f
 }
 
