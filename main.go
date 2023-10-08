@@ -2,11 +2,9 @@ package webtransport
 
 import (
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/quic-go/quic-go"
-	"go.uber.org/zap"
 	. "m7s.live/engine/v4"
 	"m7s.live/engine/v4/config"
 )
@@ -20,22 +18,22 @@ type WebTransportConfig struct {
 func (c *WebTransportConfig) OnEvent(event any) {
 	switch event.(type) {
 	case FirstConfig:
-		if c.CertFile != "" {
-			_, err := os.Stat(c.CertFile)
-			if err != nil {
-				plugin.Error("need certfile", zap.Error(err))
-				plugin.Disabled = true
-				return
-			}
-		}
-		if c.KeyFile != "" {
-			_, err := os.Stat(c.KeyFile)
-			if err != nil {
-				plugin.Error("need keyfile", zap.Error(err))
-				plugin.Disabled = true
-				return
-			}
-		}
+		// if c.CertFile != "" {
+		// 	_, err := os.Stat(c.CertFile)
+		// 	if err != nil {
+		// 		plugin.Error("need certfile", zap.Error(err))
+		// 		plugin.Disabled = true
+		// 		return
+		// 	}
+		// }
+		// if c.KeyFile != "" {
+		// 	_, err := os.Stat(c.KeyFile)
+		// 	if err != nil {
+		// 		plugin.Error("need keyfile", zap.Error(err))
+		// 		plugin.Disabled = true
+		// 		return
+		// 	}
+		// }
 		mux := http.NewServeMux()
 		mux.HandleFunc("/play/", func(w http.ResponseWriter, r *http.Request) {
 			streamPath := r.URL.Path[len("/play/"):]
