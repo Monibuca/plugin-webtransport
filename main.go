@@ -10,9 +10,9 @@ import (
 )
 
 type WebTransportConfig struct {
-	ListenAddr string `default:":4433"`
-	CertFile   string
-	KeyFile    string
+	ListenAddr string `default:":4433" desc:"监听地址端口（IP:PORT）IP可省略"`
+	CertFile   string `desc:"证书文件"`
+	KeyFile    string `desc:"密钥文件"`
 }
 
 func (c *WebTransportConfig) OnEvent(event any) {
